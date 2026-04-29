@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ImageStatus {
+  PROCESSING
+  ACCEPTED
+  REJECTED
+}
+
+enum RejectionReason {
+  TOO_SMALL
+  INVALID_FORMAT
+  TOO_SIMILAR
+  BLURRY
+  FACE_TOO_SMALL
+  MULTIPLE_FACES
+}
+
+model Image {
+  id              String           @id @default(uuid())
+  originalName    String
+  storagePath     String
+  thumbnailPath   String?
+  mimeType        String
+  fileSize        Int
+  width           Int?
+  height          Int?
+  status          ImageStatus      @default(PROCESSING)
+  rejectionReason RejectionReason?
+  rejectionDetail String?
+  perceptualHash  String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@index([status])
+  @@index([perceptualHash])
+  @@index([createdAt])
+}
